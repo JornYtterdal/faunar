@@ -1,4 +1,5 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
+// Copyright 1998-2017 Epic Faunars, Inc. All Rights Reserved.
+
 
 #include "Faunar.h"
 #include "FaunarPawn.h"
@@ -10,37 +11,52 @@ const FName AFaunarPawn::MoveRightBinding("MoveRight");
 const FName AFaunarPawn::FireForwardBinding("FireForward");
 const FName AFaunarPawn::FireRightBinding("FireRight");
 
+
 AFaunarPawn::AFaunarPawn()
-{	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
+{
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Faunar/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
 	// Create the mesh component
-	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
-	RootComponent = ShipMeshComponent;
-	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShipMesh"));
+	RootComponent = SkeletalMeshComponent;
+	SkeletalMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+
+
 	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Faunar/TwinStick/Audio/TwinStickFire.TwinStickFire"));
 	FireSound = FireAudio.Object;
+
+
+
+
+	// Create a decal in the world to show the cursor's location
+	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
+	//CursorToWorld->SetupAttachment(RootComponent);
+	//static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Faunar/Materials/M_Cursor_Decal.M_Cursor_Decal'"));
+	//if (DecalMaterialAsset.Succeeded())
+	//{
+	//CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
+	//}
+	//CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	//CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when ship does
 	CameraBoom->TargetArmLength = 1200.f;
-	CameraBoom->RelativeRotation = FRotator(-80.f, 0.f, 0.f);
+	CameraBoom->RelativeRotation = FRotator(-0.f, 50.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
-	// Create a camera...
+										  // Create a camera...
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	CameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;	// Camera does not rotate relative to arm
 
-	// Movement
+														// Movement
 	MoveSpeed = 1000.0f;
 	// Weapon
 	GunOffset = FVector(90.f, 0.f, 0.f);
-	FireRate = 0.1f;
+	FireRate = 1.0f;
 	bCanFire = true;
 }
 
@@ -48,15 +64,30 @@ void AFaunarPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 {
 	check(PlayerInputComponent);
 
-	// set up gameplay key bindings
+	// set up Faunarplay key bindings
 	PlayerInputComponent->BindAxis(MoveForwardBinding);
 	PlayerInputComponent->BindAxis(MoveRightBinding);
 	PlayerInputComponent->BindAxis(FireForwardBinding);
 	PlayerInputComponent->BindAxis(FireRightBinding);
+	//PlayerInputComponent->BindAction(FireClick);
+}
+
+void AFaunarPawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
+	GetWorld()->GetFirstPlayerController()->bEnableMouseOverEvents = false;
+
 }
 
 void AFaunarPawn::Tick(float DeltaSeconds)
 {
+
+	health = 10;
+
+
 	// Find movement direction
 	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
 	const float RightValue = GetInputAxisValue(MoveRightBinding);
@@ -73,7 +104,7 @@ void AFaunarPawn::Tick(float DeltaSeconds)
 		const FRotator NewRotation = Movement.Rotation();
 		FHitResult Hit(1.f);
 		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
-		
+
 		if (Hit.IsValidBlockingHit())
 		{
 			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
@@ -81,7 +112,9 @@ void AFaunarPawn::Tick(float DeltaSeconds)
 			RootComponent->MoveComponent(Deflection, NewRotation, true);
 		}
 	}
-	
+
+
+
 	// Create fire direction vector
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
@@ -128,4 +161,3 @@ void AFaunarPawn::ShotTimerExpired()
 {
 	bCanFire = true;
 }
-
