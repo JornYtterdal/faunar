@@ -14,7 +14,7 @@ const FName AFaunarPawn::FireRightBinding("FireRight");
 
 AFaunarPawn::AFaunarPawn()
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Faunar/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Faunar/Game/Faun/Faun.Faun"));
 	// Create the mesh component
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = SkeletalMeshComponent;
