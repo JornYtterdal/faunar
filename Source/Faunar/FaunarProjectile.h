@@ -1,4 +1,4 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
+// Copyright 1998-2017 Epic Faunars, Inc. All Rights Reserved.
 #pragma once
 
 #include "GameFramework/Actor.h"
@@ -7,7 +7,7 @@
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 
-UCLASS(config=Game)
+UCLASS(config=Faunar)
 class AFaunarProjectile : public AActor
 {
 	GENERATED_BODY()

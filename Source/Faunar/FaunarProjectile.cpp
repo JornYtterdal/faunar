@@ -1,13 +1,13 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserve
+// Copyright 1998-2017 Epic Faunars, Inc. All Rights Reserve
 
 #include "Faunar.h"
 #include "FaunarProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
-AFaunarProjectile::AFaunarProjectile() 
+AFaunarProjectile::AFaunarProjectile()
 {
 	// Static reference to the mesh to use for the projectile
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Game/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Faunar/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
 
 	// Create mesh component for the projectile sphere
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
@@ -20,13 +20,13 @@ AFaunarProjectile::AFaunarProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
-	ProjectileMovement->InitialSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 1500.f;
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
 
-	// Die after 3 seconds by default
+													  // Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
 
