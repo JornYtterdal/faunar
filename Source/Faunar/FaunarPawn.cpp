@@ -44,7 +44,7 @@ AFaunarPawn::AFaunarPawn()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when ship does
 	CameraBoom->TargetArmLength = 1200.f;
-	CameraBoom->RelativeRotation = FRotator(-0.f, 50.f, 0.f);
+	CameraBoom->RelativeRotation = FRotator(320.f, 50.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 										  // Create a camera...
